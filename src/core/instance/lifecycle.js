@@ -1,10 +1,24 @@
+import { Watcher } from '../observer/watcher'
+
 export function lifecycleMixin (Vue) {
     Vue.prototype._update = function (vnode) {
-        // 根据 vnode 渲染到页面上
-        // __patch__ 对比渲染虚拟dom
         const vm = this
         const prevVnode = vm._vnode
         vm._vnode = vnode
-        vm.__patch__(prevVnode || vm.$el, vnode)
+
+        if (!prevVnode) {
+            // 初次渲染
+            vm.$el = vm.__patch__(vm.$el, vnode)
+        } else {
+            // 修改更新
+            vm.$el = vm.__patch__(prevVnode, vnode)
+        }
     }
+}
+
+export function mountComponent (vm, el) {
+    vm.$el = el
+    new Watcher(vm, function () {
+        vm._update(vm._render())
+    })
 }

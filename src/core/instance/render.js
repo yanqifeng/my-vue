@@ -1,10 +1,8 @@
+import { VNode } from '../vdom/vnode'
+
 export function renderMixin (Vue) {
-    Vue.prototype._h = function (tag, props, children = []) {
-        return {
-            tag,
-            props,
-            children
-        }
+    Vue.prototype._h = function (tag, children = []) {
+        return new VNode(tag, children)
     }
 
     Vue.prototype._render = function () {

@@ -9,7 +9,7 @@ function createText(text) {
 }
 
 function insert(el, parent) {
-    parent.append(el)
+    parent && parent.append(el)
 }
 
 function removeNode (el) {
@@ -18,7 +18,7 @@ function removeNode (el) {
 }
 
 function createElm (vnode, parentElm) {
-    const el = document.createElement(vnode.tag)
+    const el = vnode.tag && document.createElement(vnode.tag)
     vnode.elm = el
 
     if (Array.isArray(vnode.children)) {
@@ -26,8 +26,7 @@ function createElm (vnode, parentElm) {
             createElm(v, el)
         })
     } else {
-        insert(createText(vnode.children), el)
+        insert(createText(vnode.children), parentElm)
     }
-
     insert(el, parentElm)
 }

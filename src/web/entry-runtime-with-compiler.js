@@ -3,18 +3,21 @@ import { compiler } from '@/compiler/index'
 
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (el) {
-    this.$el = document.querySelector(this.$options.el)
+    el = el && document.querySelector(el)
 
-    el = document.querySelector(this.$options.el)
-    const template = getOuterHTML(el)
-    const { render } =  compiler(template)
-    this.$options.render = render
-    
-    mount.call(this)
+    const options = this.$options
+
+    if (!options.render) {
+        const template = getOuterHTML(el)
+        const { render } = compiler(template, this)
+        options.render = render
+    }
+
+    mount.call(this, el)
 }
 
 function getOuterHTML (el) {
-    if (el.outerHTML) {
+    if (el.outerHTML) { 
         return el.outerHTML
     } else {
         const container = document.createElement('div')

@@ -1,19 +1,23 @@
 export function generate (ast) {
-    const codeGen = `with(this) {return ${genElement(ast)}}`
+    console.log(ast)
+    const render = `with(this) {return ${genElement(ast)}}`
+    console.log(render)
     return {
-        render: new Function(codeGen)
+        render
     }
 }
 
 function genElement (el) {
-    if (el.node === 'text') {
+    if (el.node === 'root') {
+        return genElement(el.child[0])
+    } else if (el.node === 'text') {
         let text = el.text.trim()
         if (text) {
             text = `'` + text.replace(/\{\{(.*)\}\}/g, ($1, $2) => `'+` + $2.trim() + `+'`) + `'`
         }
-        return `_h("${el.tag || 'span'}", null, ${text})`
+        return `_h("${el.tag || ''}", ${text})`
     } else {
-        return `_h("${el.tag || 'div'}", null, ${genChildren(el.child)})`
+        return `_h("${el.tag || 'div'}", ${genChildren(el.child)})`
     }
 }
 

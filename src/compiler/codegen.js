@@ -17,10 +17,21 @@ function genElement (el) {
         }
         return `_h("${el.tag || ''}", ${text})`
     } else {
-        return `_h("${el.tag || 'div'}", ${genChildren(el.child)})`
+        return `_h("${el.tag || 'div'}", ${genChildren(el.child)}, ${genData(el)})`
     }
 }
 
 function genChildren (children = []) {
     return `[${children.map(child => genElement(child))}]`
+}
+
+function genData (el) {
+    let data = '{'
+    if (el.attrs) {
+        el.attrs.forEach(attr => {
+            data += `${attr.name}: '${attr.value}',`
+        })
+    }
+    data = data.replace(/,$/, '') + '}'
+    return data
 }

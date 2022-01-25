@@ -19,8 +19,13 @@ function removeNode (el) {
 
 function createElm (vnode, parentElm) {
     const el = vnode.tag && document.createElement(vnode.tag)
-    vnode.elm = el
+    vnode.elm = vnode.tag ? el : null
 
+    if (el && vnode.attrs) {
+        for (const key in vnode.attrs) {
+            el.setAttribute(key, vnode.attrs[key])
+        }
+    }
     if (Array.isArray(vnode.children)) {
         vnode.children.forEach((v) => {
             createElm(v, el)

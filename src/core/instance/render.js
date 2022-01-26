@@ -5,6 +5,10 @@ export function renderMixin (Vue) {
         return new VNode(tag, children, attrs)
     }
 
+    Vue.prototype._s = function (val) {
+        return String(val)
+    }
+
     Vue.prototype._render = function () {
         // 返回 vdom
         return this.$options.render.call(this)

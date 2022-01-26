@@ -1,121 +1,104 @@
-/**
- * 简单的将html转换成ast
- * let html = '<div class="classAttr" data-type="dataType" data-id="dataId" style="color:red">我是外层div<span>我是内层span</span></div>';
- * html2AST(html);
- * 详细参考：
- * https://github.com/antiter/blogs/blob/master/easy-ast.md
-*/
+import { parseText } from './text-parser'
+
 export function html2AST(html) {
     const startTag = /<([a-zA-Z_][\w\-\.]*)((?:\s+([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))*)\s*(\/?)>/;
-  
-    const endTag = /<\/([a-zA-Z_][\w\-\.]*)>/;
-  
-    const attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g;
-  
-    const bufArray = [];
-    const results = {
-      node: "root",
-      child: []
-    };
-    let chars;
-    let match;
-    let last;
-    while (html && last != html) {
-      last = html;
-      chars = true; // 是不是文本内容
-      if (html.indexOf("</") == 0) {
-        match = html.match(endTag);
-        if (match) {
-          chars = false;
-          html = html.substring(match[0].length);
-          match[0].replace(endTag, parseEndTag);
+    const endTag = /<\/([a-zA-Z_][\w\-\.]*)>/
+    const attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/g
+
+    const bufArray = []
+    let results = {}
+    let chars
+    let match
+    while (html) {
+        chars = true
+        if (html.indexOf('</') === 0) {
+            match = html.match(endTag)
+            if (match) {
+                chars = false
+                html = html.substring(match[0].length)
+                match[0].replace(endTag, parseEndTag)
+            }
+        } else if (html.indexOf('<') === 0) {
+            match = html.match(startTag)
+            if (match) {
+                chars = false
+                html = html.substring(match[0].length)
+                match[0].replace(startTag, parseStartTag)
+            }
         }
-      } else if (html.indexOf("<") == 0) {
-        match = html.match(startTag);
-        if (match) {
-          chars = false;
-          html = html.substring(match[0].length);
-          match[0].replace(startTag, parseStartTag);
+        if (chars) {
+            let index = html.indexOf('<')
+            let text
+            if (index < 0) {
+                text = html
+                html = ''
+            } else {
+                text = html.substring(0, index)
+                html = html.substring(index)
+            }
+            let node = {
+                node: 'text',
+                text
+            }
+            let res
+            if ((res = parseText(text))) {
+                node.expression = res.expression
+            }
+            pushChild(node)
         }
-      }
-      if (chars) {
-        let index = html.indexOf("<");
-        let text;
-        if (index < 0) {
-          text = html;
-          html = "";
-        } else {
-          text = html.substring(0, index);
-          html = html.substring(index);
-        }
+    }
+
+    function parseStartTag (tag, tagName, rest) {
+        tagName = tagName.toLowerCase()
+        const attrs = []
         const node = {
-          node: "text",
-          text
-        };
-        pushChild(node);
-      }
-    }
-    function pushChild(node) {
-      if (bufArray.length === 0) {
-        results.child.push(node);
-      } else {
-        const parent = bufArray[bufArray.length - 1];
-        if (typeof parent.child == "undefined") {
-          parent.child = [];
+            node: 'element',
+            tag: tagName
         }
-        parent.child.push(node);
-      }
-    }
-    function parseStartTag(tag, tagName, rest) {
-      tagName = tagName.toLowerCase();
-  
-      const ds = {};
-      const attrs = [];
-      let unary = !!arguments[7];
-  
-      const node = {
-        node: "element",
-        tag: tagName
-      };
-      rest.replace(attr, function(match, name) {
-        const value = arguments[2]
-          ? arguments[2]
-          : arguments[3]
-          ? arguments[3]
-          : arguments[4]
-          ? arguments[4]
-          : "";
-        if (name && name.indexOf("data-") == 0) {
-          ds[name.replace("data-", "")] = value;
-        } else {
-          if (name == "class") {
-            node.class = value;
-          } else {
+        let unary = !!arguments[7] // 是否是自闭合标签，如 <div />
+        rest.replace(attr, function (match, name) {
+            const value = arguments[2]
+                ? arguments[2]
+                : arguments[3]
+                    ? arguments[3]
+                    : arguments[4]
+                        ? arguments[4]
+                        : ''
             attrs.push({
-              name,
-              value
-            });
-          }
+                name,
+                value
+            })
+        })
+        node.attrs = attrs
+        if (!unary) {
+            bufArray.push(node)
+        } else {
+            pushChild(node)
         }
-      });
-      node.dataset = ds;
-      node.attrs = attrs;
-      if (!unary) {
-        bufArray.push(node);
-      } else {
-        pushChild(node);
-      }
     }
-    function parseEndTag(tag, tagName) {
-      let pos = 0;
-      for (pos = bufArray.length - 1; pos >= 0; pos--) {
-        if (bufArray[pos].tag == tagName) {
-          break;
+
+    function parseEndTag (tag, tagName) {
+        let pos = 0;
+        for (pos = bufArray.length - 1; pos >= 0; pos--) {
+            if (bufArray[pos].tag == tagName) {
+                break;
+            }
         }
-      }
-      if (pos >= 0) {
-        pushChild(bufArray.pop());
-      }
+        if (pos >= 0) {
+            pushChild(bufArray.pop());
+        }
     }
-    return results;
-  }
+
+    function pushChild (node) {
+        if (bufArray.length === 0) {
+            results = node
+        } else {
+            const parent = bufArray[bufArray.length - 1]
+            if (typeof parent.children == "undefined") {
+                parent.children = []
+            }
+            parent.children.push(node)
+        }
+    }
+    return results
+}

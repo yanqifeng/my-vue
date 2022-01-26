@@ -7,8 +7,8 @@
     <title>Vue</title>
 </head>
 <body>
-    <div id="app">
-        <span>{{ msg }}  aaa</span>
+    <div id="app" :class="aClass" title="msg">
+        <span>{{ msg }}  aaa {{ msg }}</span>
         <div>msg</div>
     </div>
 
@@ -17,6 +17,7 @@
         const vm = new Vue({
             el: '#app',
             data: {
+                aClass: 'app',
                 msg: 'Hello World'
             }
         })

@@ -22,3 +22,10 @@ export function mountComponent (vm, el) {
         vm._update(vm._render())
     })
 }
+
+export function callHook (vm, hook) {
+    const handler = vm.$options[hook]
+    if (handler) {
+        handler.call(vm)
+    }
+}

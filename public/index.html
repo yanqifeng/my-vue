@@ -9,7 +9,7 @@
 <body>
     <div id="app" :class="aClass" title="msg">
         <span>{{ msg }}  aaa {{ msg }}</span>
-        <div>msg</div>
+        <div>{{ text }}</div>
     </div>
 
     <script src="../dist/vue.js"></script>
@@ -19,6 +19,12 @@
             data: {
                 aClass: 'app',
                 msg: 'Hello World'
+            },
+            computed: {
+                text () {
+                    console.log(111)
+                    return 'this is computed text'
+                }
             }
         })
     </script>

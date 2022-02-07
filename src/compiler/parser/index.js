@@ -25,7 +25,6 @@ export function parse (template) {
 
     parseHTML(template, {
         start (tag, attrs, unary, start, end) {
-            // console.log('开始', tag)
             let element = createASTElement(tag, attrs, currentParent)
 
             if (!root) {
@@ -39,7 +38,6 @@ export function parse (template) {
         },
 
         end (tag, start, end) {
-            // console.log('闭合', tag)
             const element = stack[stack.length - 1]
             stack.length -= 1
             currentParent = stack[stack.length - 1]

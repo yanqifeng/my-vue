@@ -23,6 +23,7 @@ export function createPatchFunction ({ nodeOps }) {
     }
 
     function patchVnode (oldVnode, vnode) {
+        const elm = vnode.elm = oldVnode.elm
         console.log('patchVnode')
     }
 

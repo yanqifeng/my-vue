@@ -1,5 +1,5 @@
 import Vue from '@/core/instance/index'
-import { patch } from '@/core/vdom/patch'
+import { patch } from './patch'
 import { mountComponent } from '@/core/instance/lifecycle'
 
 Vue.prototype.__patch__ = patch

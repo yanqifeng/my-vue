@@ -9,9 +9,9 @@ function genElement (el) {
     if (el.type === 1) {
         return `_h("${el.tag || 'div'}", ${genChildren(el.children)}, ${genData(el)})`
     } else if (el.type === 2) {
-        return `_h("", ${el.expression})`
+        return `_h("", "", "", ${el.expression})`
     } else {
-        return `_h("", "${el.text}")`
+        return `_h("", "", "", "${el.text}")`
     }
 }
 

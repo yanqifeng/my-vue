@@ -1,14 +1,22 @@
 import { Dep } from './dep'
 
+let uid = 0
+
 export class Watcher {
     constructor (vm, cb) {
         this.vm = vm
+        this.id = ++uid
+        this.newDepIds = new Set()
         this.getter = cb
         this.value = this.get()
     }
 
     addDep (dep) {
-        dep.addSub(this)
+        const id = dep.id
+        if (!this.newDepIds.has(id)) {
+            this.newDepIds.add(id)
+            dep.addSub(this)
+        }
     }
 
     run = function () {

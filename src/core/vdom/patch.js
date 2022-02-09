@@ -1,22 +1,31 @@
+function sameVnode (a, b) {
+    return (
+        a.key === b.key &&
+        a.tag === b.tag
+    )
+}
+
 export function createPatchFunction ({ nodeOps }) {
     function createElm (vnode, parentElm) {
-        const el = vnode.tag && document.createElement(vnode.tag)
-        vnode.elm = vnode.tag ? el : null
-    
-        if (el && vnode.attrs) {
-            for (const key in vnode.attrs) {
-                el.setAttribute(key, vnode.attrs[key])
+        if (vnode.tag) {
+            vnode.elm = nodeOps.createElement(vnode.tag, vnode)
+            if (vnode.elm && vnode.attrs) {
+                for (const key in vnode.attrs) {
+                    vnode.elm.setAttribute(key, vnode.attrs[key])
+                }
             }
+            if (Array.isArray(vnode.children)) {
+                vnode.children.forEach((v) => {
+                    createElm(v, vnode.elm)
+                })
+            }
+        } else {
+            vnode.elm = nodeOps.createTextNode(vnode.text)
+            // if (vnode.text) {
+            //     insert(nodeOps.createText(vnode.text), parentElm)
+            // }
         }
-        if (Array.isArray(vnode.children)) {
-            vnode.children.forEach((v) => {
-                createElm(v, el)
-            })
-        }
-        if (vnode.text) {
-            insert(nodeOps.createText(vnode.text), parentElm)
-        }
-        insert(el, parentElm)
+        insert(vnode.elm, parentElm)
     }
 
     function insert(el, parent) {
@@ -24,15 +33,14 @@ export function createPatchFunction ({ nodeOps }) {
     }
 
     function updateChildren (parentElm, oldCh, ch) {
-        console.log('updateChildren')
         let oldStartIdx = 0
         let newStartIdx = 0
         let oldEndIdx = oldCh.length - 1
-        let newEndIdx = newCh.length - 1
+        let newEndIdx = ch.length - 1
         let oldStartVnode = oldCh[0]
         let oldEndVnode = oldCh[oldEndIdx]
-        let newStartVnode = newCh[0]
-        let newEndVnode = newCh[newEndIdx]
+        let newStartVnode = ch[0]
+        let newEndVnode = ch[newEndIdx]
         /** 五种情况
          * 1. oldStartVnode === newStartVnode
          * 2. oldEndVnode === newEndVnode
@@ -40,6 +48,29 @@ export function createPatchFunction ({ nodeOps }) {
          * 4. oldEndVnode === newStartVnode
          * 5. 其他情况：遍历通过key来判断是否存在相同的节点
          */
+
+        while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+            if (sameVnode(oldStartVnode, newStartVnode)) {
+                patchVnode(oldStartVnode, newStartVnode)
+                oldStartVnode = oldCh[++oldStartIdx]
+                newStartVnode = ch[++newStartIdx]
+            } else if (sameVnode(oldEndVnode, newEndVnode)) {
+                patchVnode(oldEndVnode, newEndVnode)
+                oldEndVnode = oldCh[--oldEndIdx]
+                newEndVnode = ch[--newEndIdx]
+            } else if (sameVnode(oldStartVnode, newEndVnode)) {
+                
+            } else if (sameVnode(oldEndVnode, newStartVnode)) {
+                
+            } else {
+                
+            }
+            if (oldStartIdx > oldEndIdx) {
+
+            } else if (newStartIdx > newEndIdx) {
+                
+            }
+        }
     }
 
     function patchVnode (oldVnode, vnode) {
@@ -47,10 +78,7 @@ export function createPatchFunction ({ nodeOps }) {
         const oldCh = oldVnode.children
         const ch = vnode.children
         
-        if (vnode.text) {
-
-        } else {
-            console.log(oldCh, ch)
+        if (!vnode.text) {
             if (oldCh && ch && (oldCh !== ch)) {
                 //  都存在子节点并且不相同
                 updateChildren(elm, oldCh, ch)
@@ -64,6 +92,8 @@ export function createPatchFunction ({ nodeOps }) {
             } else if (oldVnode.text) {
                 // 旧节点存在文本节点，删除
             }
+        } else if (oldVnode.text !== vnode.text) {
+            nodeOps.setTextContent(elm, vnode.text)
         }
     }
 

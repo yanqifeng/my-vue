@@ -5,8 +5,26 @@
         "allowSyntheticDefaultImports": true,
         "baseUrl": "./",
         "paths": {
-            "@/*": [
-                "src/*"
+            "vue": [
+                "src/platforms/web/entry-runtime-with-compiler"
+            ],
+            "compiler/*": [
+                "src/compiler/*"
+            ],
+            "core/*": [
+                "src/core/*"
+            ],
+            "shared/*": [
+                "src/shared/*"
+            ],
+            "web/*": [
+                "src/web/*"
+            ],
+            "server/*": [
+                "src/server/*"
+            ],
+            "sfc/*": [
+                "src/sfc/*"
             ]
         }
     },

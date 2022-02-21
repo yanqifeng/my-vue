@@ -22,7 +22,13 @@ export default {
         }),
         aliasPlugin({
             entries: [
-                { find: '@', replacement: __dirname + '/src' }
+                { find: 'vue', replacement: __dirname + '/src/platforms/web/entry-runtime-with-compiler' },
+                { find: 'compiler', replacement: __dirname + '/src/compiler' },
+                { find: 'core', replacement: __dirname + '/src/core' },
+                { find: 'shared', replacement: __dirname + '/src/shared' },
+                { find: 'web', replacement: __dirname + '/src/web' },
+                { find: 'server', replacement: __dirname + '/src/server' },
+                { find: 'sfc', replacement: __dirname + '/src/sfc' }
             ]
         })
     ]

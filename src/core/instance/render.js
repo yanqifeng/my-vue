@@ -11,7 +11,6 @@ export function renderMixin (Vue) {
 
     Vue.prototype._render = function () {
         // 返回 vdom
-        console.log(this.$options.render)
         return this.$options.render.call(this)
     }
 }

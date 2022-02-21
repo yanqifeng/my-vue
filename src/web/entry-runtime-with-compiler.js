@@ -1,12 +1,12 @@
 import Vue from './runtime/index'
-import { compiler } from '@/compiler/index'
+import { query } from './util/index'
+import { compiler } from 'compiler/index'
 
 const mount = Vue.prototype.$mount
 Vue.prototype.$mount = function (el) {
-    el = el && document.querySelector(el)
+    el = el && query(el)
 
     const options = this.$options
-
     if (!options.render) {
         const template = getOuterHTML(el)
         const { render } = compiler(template, this)

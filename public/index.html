@@ -8,8 +8,9 @@
 </head>
 <body>
     <div id="app" :class="aClass" title="msg">
-        <span>{{ msg }}  aaa {{ msg }}</span>
-        <div>{{ text }}</div>
+        <div v-pre>{{ text }}</div>
+        <div v-for="item in arr">{{ item }}</div>
+        <div v-for="(value, key, index) in obj">{{ item }}</div>
     </div>
 
     <script src="../dist/vue.js"></script>
@@ -19,7 +20,12 @@
             data: {
                 aClass: 'app',
                 msg: 'Hello World',
-                textVal: 'hhhh'
+                textVal: 'hhhh',
+                arr: [1, 2, 3],
+                obj: {
+                    name: 111,
+                    age: 222
+                }
             },
             computed: {
                 text() {

@@ -1,5 +1,8 @@
+let uid = 0
+
 export class Dep {
     constructor () {
+        this.id = uid++
         this.subs = []
     }
 

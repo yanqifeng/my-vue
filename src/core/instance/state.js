@@ -35,10 +35,6 @@ function proxy (target, sourceKey, key) {
 function initComputed (vm, computed) {
     for (const key in computed) {
         const userDef = computed[key]
-        new Watcher(
-            vm,
-            userDef
-        )
         Object.defineProperty(vm, key, {
             get () {
                 return userDef.call(this, this)
